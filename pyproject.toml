@@ -17,8 +17,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "lxml >= 4.0",
+    "cobalt >= 6",
     "cssutils >= 2",
+    "lxml >= 4.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "nose",
 ]
 
 [project.urls]
