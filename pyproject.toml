@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docpipe"
-version = "0.0.1"
+version = "0.0.2"
 authors = [
   { name="Greg Kempe", email="greg@laws.africa" },
 ]
@@ -17,8 +17,14 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "lxml >= 4.0",
+    "cobalt >= 6",
     "cssutils >= 2",
+    "lxml >= 4.0",
+]
+
+[project.optional-dependencies]
+test = [
+  "nose",
 ]
 
 [project.urls]

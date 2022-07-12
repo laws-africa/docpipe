@@ -2,6 +2,20 @@
 
 A simple document pipeline mechanism that makes it easier to process and clean up Word and other document types.
 
+# Other dependencies
+
+This has some other non-Python dependencies for certain functionality:
+
+* soffice (open office) for handling DOC and DOCX files
+* pdftotext (poppler-utils) for extracting text from PDFs
+
+# Local development
+
+1. Clone this repo
+2. Setup a virtual environment
+3. Install dependencies: `pip install -e '.[test]'`
+4. Run tests: `nosetests`
+
 # License
 
 Copyright 2022 Laws.Africa.
