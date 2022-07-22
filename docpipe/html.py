@@ -194,6 +194,50 @@ class StripParaWhitespace(Stage):
                 p.text = p.text.lstrip(self.whitespace)
 
 
+class MergeAdjacentInlines(Stage):
+    """ Merge matching tags that are directly adjacent.
+
+    eg::
+
+        <b>text</b><b>more</b>
+
+    becomes::
+
+        <b>textmore</b>
+
+    Reads: context.html
+    Writes: context.html
+    """
+    tags = 'b i sup sub'.split()
+
+    def __call__(self, context):
+        xpath = '|'.join(f'//{x}' for x in self.tags)
+
+        for e in context.html.xpath(xpath):
+            nxt = e.getnext()
+            while nxt is not None and nxt.tag == e.tag and not e.tail:
+                merge_adjacent(e, nxt)
+                nxt = e.getnext()
+
+
+class RemoveEmptyInlines(Stage):
+    """ Remove inline elements that are empty (no children, no text or just whitespace).
+
+    Reads: context.html
+    Writes: context.html
+    """
+    tags = 'a b i sup sub'.split()
+
+    def __call__(self, context):
+        xpath = '|'.join(f'//{n}' for n in self.tags)
+
+        for node in context.html.xpath(xpath):
+            # node has no children, and either no text or just whitespace
+            # in the case of whitespace, it is preserved
+            if not list(node) and (not node.text or not node.text.strip()):
+                unwrap_element(node)
+
+
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
@@ -201,5 +245,7 @@ parse_and_clean = Pipeline([
     CleanHtml(),
     MergeUl(),
     CleanTables(),
+    MergeAdjacentInlines(),
+    RemoveEmptyInlines(),
     StripParaWhitespace(),
-])
+], name="Parse and clean", description="Parse HTML and do basic cleaning.")

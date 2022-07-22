@@ -9,11 +9,12 @@ class PipelineContext:
 
 
 class Stage:
-    def get_name(self):
-        return getattr(self, 'name', self.__class__.__name__)
+    name = None
+    description = None
 
-    def get_description(self):
-        return getattr(self, 'description', self.__class__.__doc__)
+    def __init__(self, name=None, description=None):
+        self.name = name or self.name or self.__class__.__name__
+        self.description = description or self.description or self.__class__.__doc__
 
     def __call__(self, context):
         # must be implemented and modify items in the context
@@ -25,8 +26,8 @@ class Pipeline(Stage):
 
     A pipeline is itself a stage which allows nesting of pipelines.
     """
-    def __init__(self, stages=None):
-        super().__init__()
+    def __init__(self, stages=None, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.stages = stages or []
 
     def add(self, stage):
