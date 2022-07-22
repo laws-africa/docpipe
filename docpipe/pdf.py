@@ -1,4 +1,17 @@
 import subprocess
+from .pipeline import Stage
+
+
+class PdfToText(Stage):
+    """ Converts a PDF file into HTML.
+
+    Reads: context.source_file
+    Writes: context.text
+    """
+    extra_args = ["-nopgbrk", "-raw"]
+
+    def __call__(self, context):
+        context.text = pdf_to_text(context.source_file.name, context.cropbox, self.extra_args)
 
 
 def pdf_to_text(fname, cropbox=None, extras=None):

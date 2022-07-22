@@ -1,5 +1,4 @@
 import re
-import logging
 import math
 
 from lxml import html
@@ -7,8 +6,7 @@ from lxml.html.clean import Cleaner
 import cssutils
 
 from .pipeline import Stage, Pipeline
-
-log = logging.getLogger(__name__)
+from .xmlutils import unwrap_element, merge_adjacent
 
 
 class ParseHtml(Stage):
