@@ -9,6 +9,23 @@ from .pipeline import Stage, Pipeline
 from .xmlutils import unwrap_element, merge_adjacent
 
 
+class TextToHtmlText(Stage):
+    """ Transform plain text into HTML-ready text.
+
+    Reads: context.text
+    Writes: context.html_text
+    """
+    def __call__(self, context):
+        root = html.Element("div")
+
+        for line in context.text.splitlines():
+            p = html.Element("p")
+            p.text = line
+            root.append(p)
+
+        context.html_text = html.tostring(root, pretty_print=True, encoding='unicode')
+
+
 class ParseHtml(Stage):
     """ Parse html with lxml.html.
 
