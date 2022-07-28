@@ -63,12 +63,8 @@ class ActMatcher(CitationMatcher):
     def href_pattern_args(self, match):
         args = super().href_pattern_args(match)
 
-        # use document's jurisdiction
-        juri = self.frbr_uri.country
-        if self.frbr_uri.locality:
-            juri = juri + "-" + self.frbr_uri.locality
-
-        args['juri'] = juri
+        # use document's country
+        args['juri'] = self.frbr_uri.country
 
         # adjust for short years
         year = int(args["year"])

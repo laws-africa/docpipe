@@ -156,8 +156,8 @@ class RefsActMatcherTest(TestCase):
 
         self.assertMultiLineEqual(
             """<div>
-  <p><b>Recalling </b> <a href="/akn/za-wc/act/2020/25">Act 25 of 2020</a>, the Need to Prepare</p>
-  <p><b>Recalling</b> <a href="/akn/za-wc/act/1992/1">Act 1 of 92</a> on the Composition and Operationalization</p>
+  <p><b>Recalling </b> <a href="/akn/za/act/2020/25">Act 25 of 2020</a>, the Need to Prepare</p>
+  <p><b>Recalling</b> <a href="/akn/za/act/1992/1">Act 1 of 92</a> on the Composition and Operationalization</p>
   <p>No markup inside existing <a href="#foo">Act 12 of 2021</a> A tags.</p>
 </div>""",
             lxml.html.tostring(html, encoding="unicode", pretty_print=True).strip(),
@@ -168,14 +168,14 @@ class RefsActMatcherTest(TestCase):
                     "Act 25 of 2020",
                     1,
                     15,
-                    "/akn/za-wc/act/2020/25",
+                    "/akn/za/act/2020/25",
                     None
                 ),
                 ExtractedCitation(
                     "Act 1 of 92",
                     1,
                     12,
-                    "/akn/za-wc/act/1992/1",
+                    "/akn/za/act/1992/1",
                     None
                 ),
             ],
@@ -205,8 +205,8 @@ class RefsActMatcherTest(TestCase):
       <p>No markup outside of main content Act 15 on 2007</p>
     </meta>
     <preamble>
-      <p eId="preamble__p_1"><b>Recalling </b> <ref href="/akn/za-wc/act/2020/25">Act 25 of 2020</ref>, the Need to Prepare</p>
-      <p eId="preamble__p_2"><b>Recalling</b> <ref href="/akn/za-wc/act/1992/1">Act 1 of 92</ref> on the Composition and Operationalization</p>
+      <p eId="preamble__p_1"><b>Recalling </b> <ref href="/akn/za/act/2020/25">Act 25 of 2020</ref>, the Need to Prepare</p>
+      <p eId="preamble__p_2"><b>Recalling</b> <ref href="/akn/za/act/1992/1">Act 1 of 92</ref> on the Composition and Operationalization</p>
       <p eId="preamble__p_3">No markup inside existing <ref href="#foo">Act 12 of 2021</ref> ref tags.</p>
     </preamble>
   </statement>
@@ -219,14 +219,14 @@ class RefsActMatcherTest(TestCase):
                     "Act 25 of 2020",
                     1,
                     15,
-                    "/akn/za-wc/act/2020/25",
+                    "/akn/za/act/2020/25",
                     None
                 ),
                 ExtractedCitation(
                     "Act 1 of 92",
                     1,
                     12,
-                    "/akn/za-wc/act/1992/1",
+                    "/akn/za/act/1992/1",
                     None
                 ),
             ],
@@ -246,14 +246,14 @@ class RefsActMatcherTest(TestCase):
                     "Act 25 of 2020",
                     13,
                     27,
-                    "/akn/za-wc/act/2020/25",
+                    "/akn/za/act/2020/25",
                     0,
                 ),
                 ExtractedCitation(
                     "Act, 1962 (No 58 of 1962)",
                     72,
                     97,
-                    "/akn/za-wc/act/1962/58",
+                    "/akn/za/act/1962/58",
                     0,
                 ),
             ],
