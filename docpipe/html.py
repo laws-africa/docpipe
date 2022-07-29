@@ -195,18 +195,20 @@ class CleanTables(Stage):
                         cell.attrib.pop('height')
 
 
-class StripParaWhitespace(Stage):
+class StripWhitespace(Stage):
     """ Strip whitespace at the start of p tags.
 
     Reads: context.html
     Writes: context.html
     """
     whitespace = '  '
+    tags = "p h1 h2 h3 h4 h5 li td th".split()
 
     def __call__(self, context):
-        for p in context.html.xpath('//p'):
-            if p.text:
-                p.text = p.text.lstrip(self.whitespace)
+        xpath = "|".join(f'//{x}' for x in self.tags)
+        for elem in context.html.xpath(xpath):
+            if elem.text:
+                elem.text = elem.text.lstrip(self.whitespace)
 
 
 class MergeAdjacentInlines(Stage):
@@ -262,5 +264,5 @@ parse_and_clean = Pipeline([
     CleanTables(),
     MergeAdjacentInlines(),
     RemoveEmptyInlines(),
-    StripParaWhitespace(),
+    StripWhitespace(),
 ], name="Parse and clean", description="Parse HTML and do basic cleaning.")
