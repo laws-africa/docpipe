@@ -27,26 +27,18 @@ class TextToHtmlText(Stage):
 
 
 class ParseHtml(Stage):
-    """ Parse html with lxml.html.
+    """ Parse html with lxml.html and ensure that context.html is a container and not a single element (eg. 'p').
+
+    Fixing the root is necessary usually during tests when we might be passing in plain text or just a <p> tag.
 
     Reads: context.html_text
     Writes: context.html
     """
     def __call__(self, context):
         context.html = html.fromstring(context.html_text)
+        self.ensure_container_root(context)
 
-
-class EnsureContainerRoot(Stage):
-    """ Ensure context.html is a container (body or div), and not a content element like p.
-
-    This is necessary usually during tests when we might be passing in plain text or
-    just a <p> tag.
-
-    Reads: context.html
-    Writes: context.html
-    """
-
-    def __call__(self, context):
+    def ensure_container_root(self, context):
         if context.html.tag not in ['div', 'body', 'html']:
             # lxml.html.fromstring ensures there's always html -> ...
             context.html = context.html.getroottree().getroot()
@@ -201,7 +193,7 @@ class CleanTables(Stage):
 
 
 class StripWhitespace(Stage):
-    """ Strip whitespace at the start of p tags.
+    """ Strip whitespace at the start and end of major content tags.
 
     Reads: context.html
     Writes: context.html
@@ -212,8 +204,17 @@ class StripWhitespace(Stage):
     def __call__(self, context):
         xpath = "|".join(f'//{x}' for x in self.tags)
         for elem in context.html.xpath(xpath):
+            # strip start
             if elem.text:
                 elem.text = elem.text.lstrip(self.whitespace)
+
+            # strip end
+            kids = list(elem)
+            if kids:
+                if kids[-1].tail:
+                    kids[-1].tail = kids[-1].tail.rstrip(self.whitespace)
+            elif elem.text:
+                elem.text = elem.text.rstrip(self.whitespace)
 
 
 class MergeAdjacentInlines(Stage):
@@ -263,7 +264,6 @@ class RemoveEmptyInlines(Stage):
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
-    EnsureContainerRoot(),
     ExtractBody(),
     CleanHtml(),
     MergeUl(),
