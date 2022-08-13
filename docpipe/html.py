@@ -33,18 +33,23 @@ class ParseHtml(Stage):
     Writes: context.html
     """
     def __call__(self, context):
-        context.html = self.ensure_body(html.fromstring(context.html_text))
+        context.html = html.fromstring(context.html_text)
 
-    def ensure_body(self, root):
-        # sometimes we get html that is a fragment which shows up as a div
-        # (particularly when running tests), so convert that to a body tag if necessary
-        if root.tag == 'div':
-            body = root.makeelement('body')
-            body.text = root.text
-            for elem in root.iterchildren():
-                body.append(elem)
-            root = body
-        return root
+
+class EnsureContainerRoot(Stage):
+    """ Ensure context.html is a container (body or div), and not a content element like p.
+
+    This is necessary usually during tests when we might be passing in plain text or
+    just a <p> tag.
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    def __call__(self, context):
+        if context.html.tag not in ['div', 'body', 'html']:
+            # lxml.html.fromstring ensures there's always html -> ...
+            context.html = context.html.getroottree().getroot()
 
 
 class SerialiseHtml(Stage):
@@ -258,6 +263,7 @@ class RemoveEmptyInlines(Stage):
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
+    EnsureContainerRoot(),
     ExtractBody(),
     CleanHtml(),
     MergeUl(),
