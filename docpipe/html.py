@@ -261,6 +261,62 @@ class RemoveEmptyInlines(Stage):
                 unwrap_element(node)
 
 
+class SplitPOnBr(Stage):
+    """ Split p tags that contain <br>s.
+
+    eg: <p>Some text.<br><br>Broken onto two lines.</p>
+    ->  <p>Some text.</p>
+        <p>Broken onto two lines.</p>
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    def __call__(self, context):
+        for br in context.html.xpath('//p/br'):
+            # everything after the br moves into a new p tag
+            p = context.html.makeelement('p')
+            p.text = br.tail
+
+            sibling = br.getnext()
+            while sibling:
+                p.append(sibling)
+                sibling = sibling.getnext()
+
+            br.getparent().addnext(p)
+            br.getparent().remove(br)
+
+
+class RemoveEmptyParagraphs(Stage):
+    """ Remove p tags that have no content except whitespace.
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    # tags that indicate a non-empty p, even if there is no text
+    content_tags = ['img']
+
+    def __call__(self, context):
+        xpath = '|'.join(f'.//{x}' for x in self.content_tags)
+
+        for p in context.html.xpath('//p'):
+            text = (''.join(p.xpath('.//text()'))).strip()
+
+            if not text and not p.xpath(xpath):
+                parent = p.getparent()
+                parent.remove(p)
+                p = parent
+
+                # remove empty ancestors
+                while p is not None:
+                    if any(x is not None for x in p.iterchildren()) or not p.getparent():
+                        break
+                    parent = p.getparent()
+                    parent.remove(p)
+                    p = parent
+
+
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
