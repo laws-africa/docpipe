@@ -279,7 +279,7 @@ class SplitPOnBr(Stage):
             p.text = br.tail
 
             sibling = br.getnext()
-            while sibling:
+            while sibling is not None:
                 p.append(sibling)
                 sibling = sibling.getnext()
 
