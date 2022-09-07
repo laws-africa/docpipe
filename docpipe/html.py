@@ -113,7 +113,7 @@ class MergeUl(Stage):
     Writes: context.html
     """
     def __call__(self, context):
-        for ul in context.html.xpath('//ul'):
+        for ul in context.html.xpath('.//ul'):
             prev = ul.getprevious()
             if prev is not None and prev.tag == 'ul':
                 # merge this ul into the previous one
@@ -134,7 +134,7 @@ class CleanTables(Stage):
     Writes: context.html
     """
     def __call__(self, context):
-        for table in context.html.xpath('//table'):
+        for table in context.html.xpath('.//table'):
             # strip table width
             if table.attrib.get('width'):
                 table.attrib.pop('width')
@@ -202,7 +202,7 @@ class StripWhitespace(Stage):
     tags = "p h1 h2 h3 h4 h5 li td th".split()
 
     def __call__(self, context):
-        xpath = "|".join(f'//{x}' for x in self.tags)
+        xpath = "|".join(f'.//{x}' for x in self.tags)
         for elem in context.html.xpath(xpath):
             # strip start
             if elem.text:
@@ -234,7 +234,7 @@ class MergeAdjacentInlines(Stage):
     tags = 'b i sup sub'.split()
 
     def __call__(self, context):
-        xpath = '|'.join(f'//{x}' for x in self.tags)
+        xpath = '|'.join(f'.//{x}' for x in self.tags)
 
         for e in context.html.xpath(xpath):
             nxt = e.getnext()
@@ -252,7 +252,7 @@ class RemoveEmptyInlines(Stage):
     tags = 'a b i sup sub'.split()
 
     def __call__(self, context):
-        xpath = '|'.join(f'//{n}' for n in self.tags)
+        xpath = '|'.join(f'.//{n}' for n in self.tags)
 
         for node in context.html.xpath(xpath):
             # node has no children, and either no text or just whitespace
@@ -273,7 +273,7 @@ class SplitPOnBr(Stage):
     """
 
     def __call__(self, context):
-        for br in context.html.xpath('//p/br'):
+        for br in context.html.xpath('.//p/br'):
             # everything after the br moves into a new p tag
             p = context.html.makeelement('p')
             p.text = br.tail
@@ -300,7 +300,7 @@ class RemoveEmptyParagraphs(Stage):
     def __call__(self, context):
         xpath = '|'.join(f'.//{x}' for x in self.content_tags)
 
-        for p in context.html.xpath('//p'):
+        for p in context.html.xpath('.//p'):
             text = (''.join(p.xpath('.//text()'))).strip()
 
             if not text and not p.xpath(xpath):
