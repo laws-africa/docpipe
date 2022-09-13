@@ -13,6 +13,12 @@ SOFFICE_CMD = 'soffice'
 log = logging.getLogger(__name__)
 
 
+class SOfficeError(Exception):
+    def __init__(self, message, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.message = message
+
+
 class DocToHtml(Stage):
     """ Converts a document file into HTML using soffice.
 
@@ -58,6 +64,10 @@ def soffice_convert(infile, insuffix, outsuffix):
             for fname in listdir(tmpdir) if isfile(join(tmpdir, fname))
         }
 
+        # if the file is bad, soffice will exit with a zero exit code, but not produce any files
+        if not files:
+            raise SOfficeError("soffice was unable to extract content from the file")
+
         return files[basename(outf_name)], files
 
 
@@ -70,4 +80,4 @@ def soffice(args):
         log.info(f"Output from soffice: {result.stdout}")
     except subprocess.CalledProcessError as e:
         log.error(f"Error calling soffice. Output: \n{e.output}", exc_info=e)
-        raise
+        raise SOfficeError(e.output)
