@@ -207,7 +207,7 @@ class CitationMatcher(TextPatternMatcher):
     html_marker_tag = "a"
     xml_marker_tag = "ref"
     xml_ancestor_xpath = '|'.join(f'//ns:{x}'
-                                  for x in ['coverpage', 'preface', 'preamble', 'body', 'mainBody', 'conclusions'])
+                                  for x in ['coverpage', 'preface', 'preamble', 'body', 'mainBody', 'judgmentBody', 'conclusions'])
 
     href_pattern = "/akn/"
     """ Subclasses must provide additional details for this based on their particular pattern_re."""
