@@ -1,16 +1,20 @@
 from unittest import TestCase
 
-import lxml.html
-from lxml import etree
-
-from docpipe.citations import AchprResolutionMatcher
-from docpipe.html import TextToHtmlText
-from docpipe.matchers import ExtractedCitation
+from docpipe.html import TextToHtmlText, ParseHtml, SerialiseHtml, StripWhitespace
 from docpipe.pipeline import PipelineContext
 
 
-class RefsAchprResolutionMatcherTest(TestCase):
+class HtmlTestCase(TestCase):
     maxDiff = None
+
+    def run_html_stage(self, html_text, stage):
+        context = PipelineContext(pipeline=None)
+        context.html_text = html_text
+        # parse html
+        ParseHtml()(context)
+        stage(context)
+        SerialiseHtml()(context)
+        return context.html_text
 
     def test_html_to_text(self):
         context = PipelineContext(pipeline=None)
@@ -29,3 +33,18 @@ one
 <p>  four &amp; five</p>
 </div>""",
             context.html_text.strip())
+
+    def test_strip_whitespace(self):
+        self.assertMultiLineEqual(
+            """<div>
+<h1>text <sup>a </sup></h1>
+<p>foo</p>
+<p><b>bold</b></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<h1> text <sup>a </sup></h1>
+<p> foo  </p>
+<p> <b>bold</b>  </p>
+</div>
+""", StripWhitespace()).strip())

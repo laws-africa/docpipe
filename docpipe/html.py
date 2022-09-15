@@ -27,24 +27,21 @@ class TextToHtmlText(Stage):
 
 
 class ParseHtml(Stage):
-    """ Parse html with lxml.html.
+    """ Parse html with lxml.html and ensure that context.html is a container and not a single element (eg. 'p').
+
+    Fixing the root is necessary usually during tests when we might be passing in plain text or just a <p> tag.
 
     Reads: context.html_text
     Writes: context.html
     """
     def __call__(self, context):
-        context.html = self.ensure_body(html.fromstring(context.html_text))
+        context.html = html.fromstring(context.html_text)
+        self.ensure_container_root(context)
 
-    def ensure_body(self, root):
-        # sometimes we get html that is a fragment which shows up as a div
-        # (particularly when running tests), so convert that to a body tag if necessary
-        if root.tag == 'div':
-            body = root.makeelement('body')
-            body.text = root.text
-            for elem in root.iterchildren():
-                body.append(elem)
-            root = body
-        return root
+    def ensure_container_root(self, context):
+        if context.html.tag not in ['div', 'body', 'html']:
+            # lxml.html.fromstring ensures there's always html -> ...
+            context.html = context.html.getroottree().getroot()
 
 
 class SerialiseHtml(Stage):
@@ -116,7 +113,7 @@ class MergeUl(Stage):
     Writes: context.html
     """
     def __call__(self, context):
-        for ul in context.html.xpath('//ul'):
+        for ul in context.html.xpath('.//ul'):
             prev = ul.getprevious()
             if prev is not None and prev.tag == 'ul':
                 # merge this ul into the previous one
@@ -137,7 +134,7 @@ class CleanTables(Stage):
     Writes: context.html
     """
     def __call__(self, context):
-        for table in context.html.xpath('//table'):
+        for table in context.html.xpath('.//table'):
             # strip table width
             if table.attrib.get('width'):
                 table.attrib.pop('width')
@@ -196,7 +193,7 @@ class CleanTables(Stage):
 
 
 class StripWhitespace(Stage):
-    """ Strip whitespace at the start of p tags.
+    """ Strip whitespace at the start and end of major content tags.
 
     Reads: context.html
     Writes: context.html
@@ -205,10 +202,19 @@ class StripWhitespace(Stage):
     tags = "p h1 h2 h3 h4 h5 li td th".split()
 
     def __call__(self, context):
-        xpath = "|".join(f'//{x}' for x in self.tags)
+        xpath = "|".join(f'.//{x}' for x in self.tags)
         for elem in context.html.xpath(xpath):
+            # strip start
             if elem.text:
                 elem.text = elem.text.lstrip(self.whitespace)
+
+            # strip end
+            kids = list(elem)
+            if kids:
+                if kids[-1].tail:
+                    kids[-1].tail = kids[-1].tail.rstrip(self.whitespace)
+            elif elem.text:
+                elem.text = elem.text.rstrip(self.whitespace)
 
 
 class MergeAdjacentInlines(Stage):
@@ -228,7 +234,7 @@ class MergeAdjacentInlines(Stage):
     tags = 'b i sup sub'.split()
 
     def __call__(self, context):
-        xpath = '|'.join(f'//{x}' for x in self.tags)
+        xpath = '|'.join(f'.//{x}' for x in self.tags)
 
         for e in context.html.xpath(xpath):
             nxt = e.getnext()
@@ -246,13 +252,69 @@ class RemoveEmptyInlines(Stage):
     tags = 'a b i sup sub'.split()
 
     def __call__(self, context):
-        xpath = '|'.join(f'//{n}' for n in self.tags)
+        xpath = '|'.join(f'.//{n}' for n in self.tags)
 
         for node in context.html.xpath(xpath):
             # node has no children, and either no text or just whitespace
             # in the case of whitespace, it is preserved
             if not list(node) and (not node.text or not node.text.strip()):
                 unwrap_element(node)
+
+
+class SplitPOnBr(Stage):
+    """ Split p tags that contain <br>s.
+
+    eg: <p>Some text.<br><br>Broken onto two lines.</p>
+    ->  <p>Some text.</p>
+        <p>Broken onto two lines.</p>
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    def __call__(self, context):
+        for br in context.html.xpath('.//p/br'):
+            # everything after the br moves into a new p tag
+            p = context.html.makeelement('p')
+            p.text = br.tail
+
+            sibling = br.getnext()
+            while sibling is not None:
+                p.append(sibling)
+                sibling = sibling.getnext()
+
+            br.getparent().addnext(p)
+            br.getparent().remove(br)
+
+
+class RemoveEmptyParagraphs(Stage):
+    """ Remove p tags that have no content except whitespace.
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    # tags that indicate a non-empty p, even if there is no text
+    content_tags = ['img']
+
+    def __call__(self, context):
+        xpath = '|'.join(f'.//{x}' for x in self.content_tags)
+
+        for p in context.html.xpath('.//p'):
+            text = (''.join(p.xpath('.//text()'))).strip()
+
+            if not text and not p.xpath(xpath):
+                parent = p.getparent()
+                parent.remove(p)
+                p = parent
+
+                # remove empty ancestors
+                while p is not None:
+                    if any(x is not None for x in p.iterchildren()) or not p.getparent():
+                        break
+                    parent = p.getparent()
+                    parent.remove(p)
+                    p = parent
 
 
 parse_and_clean = Pipeline([
