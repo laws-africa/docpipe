@@ -199,6 +199,8 @@ class ExtractedCitation:
     end: int
     href: str
     target_id: str
+    prefix: str
+    suffix: str
 
 
 class CitationMatcher(TextPatternMatcher):
@@ -212,6 +214,9 @@ class CitationMatcher(TextPatternMatcher):
     href_pattern = "/akn/"
     """ Subclasses must provide additional details for this based on their particular pattern_re."""
 
+    text_prefix_length = 30
+    text_suffix_length = 30
+
     def setup(self, *args, **kwargs):
         super().setup(*args, **kwargs)
         self.citations = []
@@ -224,6 +229,10 @@ class CitationMatcher(TextPatternMatcher):
                 match.end(),
                 self.make_href(match),
                 self.pagenum,
+                # prefix
+                match.string[max(match.start() - self.text_prefix_length, 0):match.start()],
+                # suffix
+                match.string[match.end():min(match.end() + self.text_suffix_length, len(match.string))],
             )
         )
 
@@ -237,7 +246,7 @@ class CitationMatcher(TextPatternMatcher):
         href = self.make_href(match)
         node.set("href", href)
         self.citations.append(
-            ExtractedCitation(match.group(), match.start(), match.end(), href, None)
+            ExtractedCitation(match.group(), match.start(), match.end(), href, None, None, None)
         )
         return node, start, end
 

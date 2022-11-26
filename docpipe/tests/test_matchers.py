@@ -43,6 +43,8 @@ class RefsAchprResolutionMatcherTest(TestCase):
                     1,
                     36,
                     "/akn/aa-au/statement/resolution/achpr/2020/437",
+                    None,
+                    None,
                     None
                 ),
                 ExtractedCitation(
@@ -50,6 +52,8 @@ class RefsAchprResolutionMatcherTest(TestCase):
                     16,
                     41,
                     "/akn/aa-au/statement/resolution/achpr/2005/79",
+                    None,
+                    None,
                     None
                 ),
             ],
@@ -94,14 +98,18 @@ class RefsAchprResolutionMatcherTest(TestCase):
                     1,
                     36,
                     "/akn/aa-au/statement/resolution/achpr/2020/437",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
                 ExtractedCitation(
                     "ACHPR/Res.79 (XXXVIII) 05",
                     16,
                     41,
                     "/akn/aa-au/statement/resolution/achpr/2005/79",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
             ],
             self.marker.citations,
@@ -122,6 +130,8 @@ class RefsAchprResolutionMatcherTest(TestCase):
                     59,
                     "/akn/aa-au/statement/resolution/achpr/2020/437",
                     0,
+                    '\n  Recalling resolution ',
+                    ', the Need to Prepare\n  Recall',
                 ),
                 ExtractedCitation(
                     "ACHPR/Res.79 (XXXVIII) 05",
@@ -129,6 +139,8 @@ class RefsAchprResolutionMatcherTest(TestCase):
                     133,
                     "/akn/aa-au/statement/resolution/achpr/2005/79",
                     0,
+                    're\n  Recalling its Resolution ',
+                    ' on the Composition and Operat',
                 ),
             ],
             self.marker.citations,
@@ -169,14 +181,18 @@ class RefsActMatcherTest(TestCase):
                     1,
                     15,
                     "/akn/za/act/2020/25",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
                 ExtractedCitation(
                     "Act 1 of 92",
                     1,
                     12,
                     "/akn/za/act/1992/1",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
             ],
             self.marker.citations,
@@ -220,14 +236,18 @@ class RefsActMatcherTest(TestCase):
                     1,
                     15,
                     "/akn/za/act/2020/25",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
                 ExtractedCitation(
                     "Act 1 of 92",
                     1,
                     12,
                     "/akn/za/act/1992/1",
-                    None
+                    None,
+                    None,
+                    None,
                 ),
             ],
             self.marker.citations,
@@ -248,6 +268,8 @@ class RefsActMatcherTest(TestCase):
                     27,
                     "/akn/za/act/2020/25",
                     0,
+                    '\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
                 ),
                 ExtractedCitation(
                     "Act, 1962 (No 58 of 1962)",
@@ -255,6 +277,8 @@ class RefsActMatcherTest(TestCase):
                     97,
                     "/akn/za/act/1962/58",
                     0,
+                    'repare\n  Recalling Income Tax ',
+                    ' on the Composition and Operat',
                 ),
             ],
             self.marker.citations,
