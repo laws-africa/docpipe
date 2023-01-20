@@ -12,6 +12,8 @@ from docpipe.pipeline import Stage, Attachment
 SOFFICE_CMD = 'soffice'
 log = logging.getLogger(__name__)
 
+# subprocess timeout (in seconds)
+TIMEOUT = 60 * 30
 
 class SOfficeError(Exception):
     def __init__(self, message, *args, **kwargs):
@@ -75,8 +77,13 @@ def soffice(args):
     args = [SOFFICE_CMD, "--headless"] + args
 
     try:
-        result = subprocess.run(args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, check=True,
-                                encoding='utf-8', errors='backslashreplace')
+        result = subprocess.run(
+            args,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.STDOUT, check=True,
+            encoding='utf-8',
+            timeout=TIMEOUT,
+            errors='backslashreplace')
         log.info(f"Output from soffice: {result.stdout}")
     except subprocess.CalledProcessError as e:
         log.error(f"Error calling soffice. Output: \n{e.output}", exc_info=e)
