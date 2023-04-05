@@ -273,7 +273,7 @@ class SplitPOnBr(Stage):
     """
 
     def __call__(self, context):
-        for br in context.html.xpath('.//p/br'):
+        for br in reversed(list(context.html.xpath('.//p/br'))):
             # everything after the br moves into a new p tag
             p = context.html.makeelement('p')
             p.text = br.tail

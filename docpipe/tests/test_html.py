@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from docpipe.html import TextToHtmlText, ParseHtml, SerialiseHtml, StripWhitespace
+from docpipe.html import TextToHtmlText, ParseHtml, SerialiseHtml, StripWhitespace, SplitPOnBr
 from docpipe.pipeline import PipelineContext
 
 
@@ -48,3 +48,18 @@ one
 <p> <b>bold</b>  </p>
 </div>
 """, StripWhitespace()).strip())
+
+    def test_split_p_on_br(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in the prescribed</p>
+<p>manner by a party to a marriage (hereinafter called the applicant) or by any other</p>
+<p>person who has a material interest in the matter on behalf of the applicant, grant</p>
+<p>an interdict against the other party to the marriage (hereinafter called the</p>
+<p>respondent) enjoining the respondent—</p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in the prescribed<br>manner by a party to a marriage (hereinafter called the applicant) or by any other<br>person who has a material interest in the matter on behalf of the applicant, grant<br>an interdict against the other party to the marriage (hereinafter called the<br>respondent) enjoining the respondent—</p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
