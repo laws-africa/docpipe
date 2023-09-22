@@ -194,6 +194,7 @@ class CleanTables(Stage):
 
 class StripWhitespace(Stage):
     """ Strip whitespace at the start and end of major content tags.
+    Doesn't strip whitespace within tags at the start or end, as it could be significant.
 
     Reads: context.html
     Writes: context.html
@@ -284,6 +285,24 @@ class SplitPOnBr(Stage):
                 sibling = sibling.getnext()
 
             br.getparent().addnext(p)
+            br.getparent().remove(br)
+
+        # TODO: deal with e.g.
+        #  <p><b>[PCh1]</b><b>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</b></p>
+        #  better
+        for br in reversed(list(context.html.xpath('.//p/b/br'))):
+            # everything after the br moves into a new p tag
+            b = context.html.makeelement('b')
+            p = context.html.makeelement('p')
+            b.text = br.tail
+            p.append(b)
+
+            sibling = br.getnext()
+            while sibling is not None:
+                p.append(sibling)
+                sibling = sibling.getnext()
+
+            br.getparent().getparent().addnext(p)
             br.getparent().remove(br)
 
 
