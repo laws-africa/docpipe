@@ -69,7 +69,7 @@ one
             """<div>
 <p><b>2. </b>text 1 <b>bold 1</b></p>
 <p><b>bold 2</b> text 2</p>
-<p>text 3</p>
+<p>text <i>3</i></p>
 <p>text 4</p>
 <p>text 5</p>
 </div>""",
@@ -78,7 +78,7 @@ one
 <p>
     <b>2. </b>text 1 <b>bold 1<br>
     bold 2</b> text 2<br>
-    text 3<br>
+    text <i>3</i><br>
     text 4<br>
     text 5</p>
 </div>
