@@ -70,7 +70,8 @@ one
 <p><b>2. </b>text 1 <b>bold <i>1</i></b></p>
 <p><b>bold 2</b> text 2<b></b></p>
 <p><b></b>text <i>3</i></p>
-<p><span>text 4</span></p>
+<p><span style="foo: bar">text</span></p>
+<p><span>4</span></p>
 <p>text 5</p>
 </div>""",
             self.run_html_stage("""
@@ -79,7 +80,8 @@ one
     <b>2. </b>text 1 <b>bold <i>1</i><br>
     bold 2</b> text 2<b><br></b>
     text <i>3</i><br>
-    <span>text 4</span><br>
+    <span style="foo: bar">text<br>
+    4</span><br>
     text 5</p>
 </div>
 """.replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
