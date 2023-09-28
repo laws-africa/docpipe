@@ -123,15 +123,15 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_nested_bold_simple(self):
+    def test_split_p_on_br_bold_mixed(self):
         self.assertMultiLineEqual(
             """<div>
-<p>text 1 <b>bold 1</b></p>
-<p><b>bold 2</b> text 2</p>
+<p><b>[PCh1]</b>CHAPTER <b>1</b></p>
+<p><b>THE INTERPRETATION</b> OF LAWS ACT</p>
 </div>""",
             self.run_html_stage("""
 <div>
-<p>text 1 <b>bold 1<br>bold 2</b> text 2</p>
+<p><b>[PCh1]</b>CHAPTER <b>1<br>THE INTERPRETATION</b> OF LAWS ACT</p>
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
