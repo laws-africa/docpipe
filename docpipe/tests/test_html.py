@@ -64,6 +64,21 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
+    def test_split_p_on_br_deep_mixed(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in <b>the prescribed</b></p>
+<p><b>manner</b> by a party to a marriage (hereinafter called the applicant) or by any other</p>
+<p>person who has a material interest in the matter on behalf of the applicant, grant</p>
+<p>an interdict against the other party to the marriage (hereinafter called the</p>
+<p>respondent) enjoining the respondent—</p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in <b>the prescribed<br>manner</b> by a party to a marriage (hereinafter called the applicant) or by any other<br>person who has a material interest in the matter on behalf of the applicant, grant<br>an interdict against the other party to the marriage (hereinafter called the<br>respondent) enjoining the respondent—</p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
     def test_split_p_on_br_nested_bold(self):
         self.assertMultiLineEqual(
             """<div>
@@ -97,5 +112,45 @@ one
             self.run_html_stage("""
 <div>
 <p><b>[PCh1]</b><b><i>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</i></b></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested_italics_bold(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><i><b>CHAPTER 1</b></i></p>
+<p><i><b>THE INTERPRETATION OF LAWS ACT</b></i></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><i><b>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</b></i></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested_bold_multi(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><b>CHAPTER 1</b></p>
+<p><b>THE INTERPRETATION OF</b></p>
+<p><b>LAWS</b></p>
+<p><b>ACT</b></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><b>CHAPTER 1<br>THE INTERPRETATION OF<br>LAWS<br>ACT</b></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested_italics_bold_multi(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><i><b>CHAPTER 1</b></i></p>
+<p><i><b>THE INTERPRETATION OF</b></i></p>
+<p><i><b>LAWS</b></i></p>
+<p><i><b>ACT</b></i></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><i><b>CHAPTER 1<br>THE INTERPRETATION OF<br>LAWS<br>ACT</b></i></p>
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))

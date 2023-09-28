@@ -274,35 +274,44 @@ class SplitPOnBr(Stage):
     """
 
     def __call__(self, context):
-        for br in reversed(list(context.html.xpath('.//p/br'))):
+        for br in reversed(list(context.html.xpath('.//p//br'))):
             # everything after the br moves into a new p tag
             p = context.html.makeelement('p')
-            p.text = br.tail
+            # reverse order of elements to be created afresh before hitting the ancestor p
+            # e.g. ['i', 'b'] in the case of <p><b><i>Text<br>text</i></b></p>
+            ancestor_tags = []
+            elements = []
 
-            sibling = br.getnext()
-            while sibling is not None:
-                p.append(sibling)
-                sibling = sibling.getnext()
+            # parent should be the original p, but we want to track everything on the way up too
+            parent = br.getparent()
+            while parent.tag != 'p':
+                ancestor_tags.append(parent.tag)
+                parent = parent.getparent()
 
-            br.getparent().addnext(p)
-            br.getparent().remove(br)
+            for elem_tag in ancestor_tags:
+                elem = context.html.makeelement(elem_tag)
+                elements.append(elem)
+            elements.append(p)
+            # now we have e.g. [<i>, <b>, <p>]
+            # the lowest-down, <i> in the example but at minimum <p>,
+            # gets the text
+            for i, elem in enumerate(elements):
+                if i == 0:
+                    elem.text = br.tail
 
-        # TODO: deal with e.g.
-        #  <p><b>[PCh1]</b><b>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</b></p>
-        #  better
-        for br in reversed(list(context.html.xpath('.//p/b/br'))):
-            # everything after the br moves into a new p tag
-            b = context.html.makeelement('b')
-            p = context.html.makeelement('p')
-            b.text = br.tail
-            p.append(b)
+                    # when there are multiple <br>s in a single <p>
+                    sibling = br.getnext()
+                    while sibling is not None:
+                        p.append(sibling)
+                        sibling = sibling.getnext()
 
-            sibling = br.getnext()
-            while sibling is not None:
-                p.append(sibling)
-                sibling = sibling.getnext()
+                    continue
+                # for all but the first / only element, append the lower-down one
+                # (if there's only one, <p>, nothing needs to be appended)
+                elem.append(elements[i - 1])
 
-            br.getparent().getparent().addnext(p)
+            # parent is the original p
+            parent.addnext(p)
             br.getparent().remove(br)
 
 
