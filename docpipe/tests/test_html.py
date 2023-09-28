@@ -67,7 +67,7 @@ one
     def test_split_p_on_br_deep_mixed(self):
         self.assertMultiLineEqual(
             """<div>
-<p><b>2. </b>text 1 <b>bold 1</b></p>
+<p><b>2. </b>text 1 <b>bold <i>1</i></b></p>
 <p><b>bold 2</b> text 2</p>
 <p>text <i>3</i></p>
 <p>text 4</p>
@@ -76,7 +76,7 @@ one
             self.run_html_stage("""
 <div>
 <p>
-    <b>2. </b>text 1 <b>bold 1<br>
+    <b>2. </b>text 1 <b>bold <i>1</i><br>
     bold 2</b> text 2<br>
     text <i>3</i><br>
     text 4<br>
