@@ -299,6 +299,9 @@ class SplitPOnBr(Stage):
                 if i == 0:
                     elem.text = br.tail
 
+                    # when the immediate child of br is a nested tag
+                    # e.g. <p>Text<br><i>italics</i></p>
+                    # -- make sure <italics> ends up in the right place
                     sibling = br.getnext()
                     while sibling is not None:
                         elem.append(sibling)
@@ -311,6 +314,7 @@ class SplitPOnBr(Stage):
                     br.getparent().tail = None
 
                     continue
+
                 # for all but the first / only element, append the lower-down one
                 # (if there's only one, <p>, nothing needs to be appended)
                 elem.append(elements[i - 1])

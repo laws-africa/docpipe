@@ -156,7 +156,19 @@ one
 </div>
 """.replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_sibling(self):
+    def test_split_p_on_br_sibling_of_br(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p>Text 1</p>
+<p><i>italics</i></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p>Text 1<br><i>italics</i></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_sibling_of_parent(self):
         self.assertMultiLineEqual(
             """<div>
 <p><b>Text</b></p>
