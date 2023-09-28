@@ -314,7 +314,8 @@ class SplitPOnBr(Stage):
                 # (if there's only one, <p>, nothing needs to be appended)
                 elem.append(elements[i - 1])
 
-            # special case: e.g. <b>bold<br>bold</b> text <i>italics<br>italics</i>
+            # e.g. <p><b>Text<br>text</b> <i>italics</i></p>
+            # -- make sure ' plain <i>italics</i>' goes after '<b>text<b>'
             sibling = br.getparent().getnext()
             if sibling is not None and len(ancestor_tags):
                 p.append(sibling)
