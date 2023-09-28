@@ -63,3 +63,15 @@ one
 <p><b>2. </b>(1) A judge or magistrate in chambers may, on application in the prescribed<br>manner by a party to a marriage (hereinafter called the applicant) or by any other<br>person who has a material interest in the matter on behalf of the applicant, grant<br>an interdict against the other party to the marriage (hereinafter called the<br>respondent) enjoining the respondent—</p>
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><b>CHAPTER 1</b></p>
+<p><b>THE INTERPRETATION OF LAWS ACT</b></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><b>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</b></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
