@@ -64,7 +64,7 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_nested(self):
+    def test_split_p_on_br_nested_bold(self):
         self.assertMultiLineEqual(
             """<div>
 <p><b>[PCh1]</b><b>CHAPTER 1</b></p>
@@ -73,5 +73,29 @@ one
             self.run_html_stage("""
 <div>
 <p><b>[PCh1]</b><b>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</b></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested_italics(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><i>CHAPTER 1</i></p>
+<p><i>THE INTERPRETATION OF LAWS ACT</i></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><i>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</i></p>
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
+    def test_split_p_on_br_nested_bold_italics(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p><b>[PCh1]</b><b><i>CHAPTER 1</i></b></p>
+<p><b><i>THE INTERPRETATION OF LAWS ACT</i></b></p>
+</div>""",
+            self.run_html_stage("""
+<div>
+<p><b>[PCh1]</b><b><i>CHAPTER 1<br>THE INTERPRETATION OF LAWS ACT</i></b></p>
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
