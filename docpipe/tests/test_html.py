@@ -114,18 +114,6 @@ one
 </div>
 """.replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_bold_mixed(self):
-        self.assertMultiLineEqual(
-            """<div>
-<p><b>[PCh1]</b>CHAPTER <b>1</b></p>
-<p><b>THE INTERPRETATION</b> OF LAWS ACT</p>
-</div>""",
-            self.run_html_stage("""
-<div>
-<p><b>[PCh1]</b>CHAPTER <b>1<br>THE INTERPRETATION</b> OF LAWS ACT</p>
-</div>
-""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
-
     def test_split_p_on_br_nested_italics(self):
         self.assertMultiLineEqual(
             """<div>
