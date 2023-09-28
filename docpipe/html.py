@@ -305,7 +305,8 @@ class SplitPOnBr(Stage):
                         sibling = sibling.getnext()
 
                     # when the br falls inside an intervening tag, e.g.
-                    # <p>text 1 <b>bold 1<br>bold 1</b> text 2</p>
+                    # <p>Text 1 <b>bold 1<br>bold 2</b> text 2</p>
+                    # make sure ' text 2' ends up in the right place
                     elem.tail = br.getparent().tail
                     br.getparent().tail = None
 
