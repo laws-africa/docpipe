@@ -64,7 +64,7 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_deep_mixed(self):
+    def test_split_p_on_br_weird(self):
         self.assertMultiLineEqual(
             """<div>
 <p><b>2. </b>text 1 <b>bold <i>1</i></b></p>
@@ -98,7 +98,7 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_mixed(self):
+    def test_split_p_on_br_inside_bold_italics(self):
         self.assertMultiLineEqual(
             """<div>
 <p>text 1 <b>bold 1</b></p>
@@ -107,9 +107,12 @@ one
 </div>""",
             self.run_html_stage("""
 <div>
-<p>text 1 <b>bold 1<br>bold 2</b> text 2 <i>italics 1<br>italics 2</i> text 3 <b>bold 3</b></p>
+<p>
+    text 1 <b>bold 1<br>
+    bold 2</b> text 2 <i>italics 1<br>
+    italics 2</i> text 3 <b>bold 3</b></p>
 </div>
-""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+""".replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
     def test_split_p_on_br_nested_bold(self):
         self.assertMultiLineEqual(
