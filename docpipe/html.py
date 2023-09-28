@@ -299,16 +299,20 @@ class SplitPOnBr(Stage):
                 if i == 0:
                     elem.text = br.tail
 
-                    # when there are multiple <br>s in a single <p>
-                    sibling = br.getnext()
-                    while sibling is not None:
-                        p.append(sibling)
-                        sibling = sibling.getnext()
+                    # when the br falls inside an intervening tag, e.g.
+                    # <p>text 1 <b>bold 1<br>bold 1</b> text 2</p>
+                    elem.tail = br.getparent().tail
+                    br.getparent().tail = None
 
                     continue
                 # for all but the first / only element, append the lower-down one
                 # (if there's only one, <p>, nothing needs to be appended)
                 elem.append(elements[i - 1])
+
+            # special case: e.g. <b>bold<br>bold</b> text <i>italics<br>italics</i>
+            sibling = br.getparent().getnext()
+            if sibling is not None and len(ancestor_tags):
+                p.append(sibling)
 
             # parent is the original p
             parent.addnext(p)
