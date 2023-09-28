@@ -67,17 +67,22 @@ one
     def test_split_p_on_br_deep_mixed(self):
         self.assertMultiLineEqual(
             """<div>
-<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in <b>the prescribed</b></p>
-<p><b>manner</b> by a party to a marriage (hereinafter called the applicant) or by any other</p>
-<p>person who has a material interest in the matter on behalf of the applicant, grant</p>
-<p>an interdict against the other party to the marriage (hereinafter called the</p>
-<p>respondent) enjoining the respondent—</p>
+<p><b>2. </b>text 1 <b>bold 1</b></p>
+<p><b>bold 2</b> text 2</p>
+<p>text 3</p>
+<p>text 4</p>
+<p>text 5</p>
 </div>""",
             self.run_html_stage("""
 <div>
-<p><b>2. </b>(1) A judge or magistrate in chambers may, on application in <b>the prescribed<br>manner</b> by a party to a marriage (hereinafter called the applicant) or by any other<br>person who has a material interest in the matter on behalf of the applicant, grant<br>an interdict against the other party to the marriage (hereinafter called the<br>respondent) enjoining the respondent—</p>
+<p>
+    <b>2. </b>text 1 <b>bold 1<br>
+    bold 2</b> text 2<br>
+    text 3<br>
+    text 4<br>
+    text 5</p>
 </div>
-""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+""".replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
     def test_split_p_on_br_bold(self):
         self.assertMultiLineEqual(
