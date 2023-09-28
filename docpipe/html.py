@@ -44,6 +44,18 @@ class ParseHtml(Stage):
             context.html = context.html.getroottree().getroot()
 
 
+class NukeHiddenText(Stage):
+    """ Identifies hidden spans like [PCh1s2] before section 2 and deletes them.
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    def __call__(self, context):
+        for hidden_span in context.html.xpath('.//span[@style="display: none"]'):
+            hidden_span.getparent().remove(hidden_span)
+
+
 class SerialiseHtml(Stage):
     """ Serialise html into text.
 
@@ -363,6 +375,7 @@ class RemoveEmptyParagraphs(Stage):
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
+    NukeHiddenText(),
     ExtractBody(),
     CleanHtml(),
     MergeUl(),
