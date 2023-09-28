@@ -114,7 +114,7 @@ one
 </div>
 """.replace('\n    ', ''), SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
-    def test_split_p_on_br_nested_italics(self):
+    def test_split_p_on_br_italics_basic(self):
         self.assertMultiLineEqual(
             """<div>
 <p><b>[PCh1]</b><i>CHAPTER 1</i></p>
