@@ -192,6 +192,18 @@ one
 </div>
 """, SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
 
+    def test_split_p_on_br_first_second_tail(self):
+        self.assertMultiLineEqual(
+            """<div>
+<p>First </p>
+<p> second</p>tail
+</div>""",
+            self.run_html_stage("""
+<div>
+<p>First <br/> second</p>tail
+</div>
+""", SplitPOnBr()).strip().replace('</p><p>', '</p>\n<p>'))
+
     def test_split_p_on_br_weird(self):
         self.assertMultiLineEqual(
             """<div>
