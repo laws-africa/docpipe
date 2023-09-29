@@ -311,7 +311,7 @@ class SplitPOnBr(Stage):
                 if i == 0:
                     elem.text = br.tail
 
-                    # when the immediate child of br is a nested tag
+                    # when the immediate sibling of br is a tag
                     # e.g. <p>Text<br><i>italics</i></p>
                     # -- make sure <italics> ends up in the right place
                     sibling = br.getnext()
