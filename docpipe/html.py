@@ -44,6 +44,18 @@ class ParseHtml(Stage):
             context.html = context.html.getroottree().getroot()
 
 
+class NukeHiddenText(Stage):
+    """ Identifies hidden spans like [PCh1s2] before section 2 and deletes them.
+
+    Reads: context.html
+    Writes: context.html
+    """
+
+    def __call__(self, context):
+        for hidden_span in context.html.xpath('.//span[@style="display: none"]'):
+            hidden_span.getparent().remove(hidden_span)
+
+
 class SerialiseHtml(Stage):
     """ Serialise html into text.
 
@@ -194,6 +206,7 @@ class CleanTables(Stage):
 
 class StripWhitespace(Stage):
     """ Strip whitespace at the start and end of major content tags.
+    Doesn't strip whitespace within tags at the start or end, as it could be significant.
 
     Reads: context.html
     Writes: context.html
@@ -273,17 +286,59 @@ class SplitPOnBr(Stage):
     """
 
     def __call__(self, context):
-        for br in reversed(list(context.html.xpath('.//p/br'))):
+        for br in reversed(list(context.html.xpath('.//p//br'))):
             # everything after the br moves into a new p tag
             p = context.html.makeelement('p')
-            p.text = br.tail
+            # reverse order of elements to be created afresh before hitting the ancestor p
+            # e.g. ['i', 'b'] in the case of <p><b><i>Text<br>text</i></b></p>
+            ancestor_tags = []
+            elements = []
 
-            sibling = br.getnext()
-            while sibling is not None:
+            # parent should be the original p, but we want to track everything on the way up too
+            parent = br.getparent()
+            while parent.tag != 'p':
+                ancestor_tags.append(parent.tag)
+                parent = parent.getparent()
+
+            for elem_tag in ancestor_tags:
+                elem = context.html.makeelement(elem_tag)
+                elements.append(elem)
+            elements.append(p)
+            # now we have e.g. [<i>, <b>, <p>]
+            # the lowest-down, <i> in the example but at minimum <p>,
+            # gets the text
+            for i, elem in enumerate(elements):
+                if i == 0:
+                    elem.text = br.tail
+
+                    # when the immediate sibling of br is a tag
+                    # e.g. <p>Text<br><i>italics</i></p>
+                    # -- make sure <italics> ends up in the right place
+                    sibling = br.getnext()
+                    while sibling is not None:
+                        elem.append(sibling)
+                        sibling = sibling.getnext()
+
+                    # when the br falls inside an intervening tag, e.g.
+                    # <p>Text 1 <b>bold 1<br>bold 2</b> text 2</p>
+                    # make sure ' text 2' ends up in the right place
+                    elem.tail = br.getparent().tail
+                    br.getparent().tail = None
+
+                    continue
+
+                # for all but the first / only element, append the lower-down one
+                # (if there's only one, <p>, nothing needs to be appended)
+                elem.append(elements[i - 1])
+
+            # e.g. <p><b>Text<br>text</b> <i>italics</i></p>
+            # -- make sure ' plain <i>italics</i>' goes after '<b>text<b>'
+            sibling = br.getparent().getnext()
+            if sibling is not None and len(ancestor_tags):
                 p.append(sibling)
-                sibling = sibling.getnext()
 
-            br.getparent().addnext(p)
+            # parent is the original p
+            parent.addnext(p)
             br.getparent().remove(br)
 
 
@@ -320,6 +375,7 @@ class RemoveEmptyParagraphs(Stage):
 parse_and_clean = Pipeline([
     NormaliseHtmlTextWhitespace(),
     ParseHtml(),
+    NukeHiddenText(),
     ExtractBody(),
     CleanHtml(),
     MergeUl(),
