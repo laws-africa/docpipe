@@ -365,7 +365,7 @@ class RemoveEmptyParagraphs(Stage):
 
                 # remove empty ancestors
                 while p is not None:
-                    if any(x is not None for x in p.iterchildren()) or not p.getparent():
+                    if any(x is not None for x in p.iterchildren()) or p.getparent() is None:
                         break
                     parent = p.getparent()
                     parent.remove(p)
