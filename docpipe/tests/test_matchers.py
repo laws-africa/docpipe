@@ -257,28 +257,38 @@ class RefsActMatcherTest(TestCase):
         text = """
   Recalling Act 25 of 2020, the Need to Prepare
   Recalling Income Tax Act, 1962 (No 58 of 1962) on the Composition and Operationalization
+  Recalling Act 125 of 2021, the Need to Prepare
+  Recalling Act no. 225 of 2021, the Need to Prepare
+  Recalling Act no. 1 of 2021, the Need to Prepare
 """
         self.marker.extract_text_matches(self.frbr_uri, text)
 
         self.assertEqual(
             [
                 ExtractedCitation(
-                    "Act 25 of 2020",
-                    13,
-                    27,
-                    "/akn/za/act/2020/25",
-                    0,
+                    "Act 25 of 2020", 13, 27, "/akn/za/act/2020/25", 0,
                     '\n  Recalling ',
                     ', the Need to Prepare\n  Recall',
                 ),
                 ExtractedCitation(
-                    "Act, 1962 (No 58 of 1962)",
-                    72,
-                    97,
-                    "/akn/za/act/1962/58",
-                    0,
+                    "Act, 1962 (No 58 of 1962)", 72, 97, "/akn/za/act/1962/58", 0,
                     'repare\n  Recalling Income Tax ',
                     ' on the Composition and Operat',
+                ),
+                ExtractedCitation(
+                    "Act 125 of 2021", 152, 167, "/akn/za/act/2021/125", 0,
+                    'perationalization\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act no. 225 of 2021", 201, 220, "/akn/za/act/2021/225", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act no. 1 of 2021", 254, 271, "/akn/za/act/2021/1", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n',
                 ),
             ],
             self.marker.citations,
