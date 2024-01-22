@@ -260,6 +260,10 @@ class RefsActMatcherTest(TestCase):
   Recalling Act 195 of 2021, the Need to Prepare
   Recalling Act no. 205 of 2021, the Need to Prepare
   Recalling Act no. 1 of 2021, the Need to Prepare
+  Recalling Act no. 1994 of 2021, the Need to Prepare
+  Recalling Act 1994 of 2021, the Need to Prepare
+  Recalling Act no. 2022 of 2021, the Need to Prepare
+  Recalling Act 2022 of 2021, the Need to Prepare
 """
         self.marker.extract_text_matches(self.frbr_uri, text)
 
@@ -287,6 +291,26 @@ class RefsActMatcherTest(TestCase):
                 ),
                 ExtractedCitation(
                     "Act no. 1 of 2021", 254, 271, "/akn/za/act/2021/1", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act no. 1994 of 2021", 305, 325, "/akn/za/act/2021/1994", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act 1994 of 2021", 359, 375, "/akn/za/act/2021/1994", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act no. 2022 of 2021", 409, 429, "/akn/za/act/2021/2022", 0,
+                    'e Need to Prepare\n  Recalling ',
+                    ', the Need to Prepare\n  Recall',
+                ),
+                ExtractedCitation(
+                    "Act 2022 of 2021", 463, 479, "/akn/za/act/2021/2022", 0,
                     'e Need to Prepare\n  Recalling ',
                     ', the Need to Prepare\n',
                 ),
