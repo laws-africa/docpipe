@@ -46,7 +46,7 @@ class ActMatcher(CitationMatcher):
     """
     pattern_re = re.compile(
         r"""\bAct,?\s*
-            (\d{2,4}\s*)?
+            ((19|20)\d{2}\s*)?
             \(?
             (?P<ref>
               ([no\.]*\s*)?
