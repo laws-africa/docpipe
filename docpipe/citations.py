@@ -52,7 +52,7 @@ class ActMatcher(CitationMatcher):
               ([no\.]*\s*)?
               (?P<num>\d+)\s*
               of\s*
-              (?P<year>\d{2,4})
+              (?P<year>\d{4})
             )\)?
         """,
         re.X | re.I)
@@ -65,14 +65,5 @@ class ActMatcher(CitationMatcher):
 
         # use document's country
         args['juri'] = self.frbr_uri.country
-
-        # adjust for short years
-        year = int(args["year"])
-        if year < 100:
-            if year > 80:
-                year = 1900 + year
-            else:
-                year = 2000 + year
-            args["year"] = str(year)
 
         return args
