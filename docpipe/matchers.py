@@ -222,23 +222,29 @@ class CitationMatcher(TextPatternMatcher):
         self.citations = []
 
     def handle_text_match(self, text, match):
-        self.citations.append(
-            ExtractedCitation(
-                match.group(),
-                match.start(),
-                match.end(),
-                self.make_href(match),
-                self.pagenum,
-                # prefix
-                match.string[max(match.start() - self.text_prefix_length, 0):match.start()],
-                # suffix
-                match.string[match.end():min(match.end() + self.text_suffix_length, len(match.string))],
+        href = self.make_href(match)
+        if href:
+            self.citations.append(
+                ExtractedCitation(
+                    match.group(),
+                    match.start(),
+                    match.end(),
+                    href,
+                    self.pagenum,
+                    # prefix
+                    match.string[max(match.start() - self.text_prefix_length, 0):match.start()],
+                    # suffix
+                    match.string[match.end():min(match.end() + self.text_suffix_length, len(match.string))],
+                )
             )
-        )
 
     def is_node_match_valid(self, node, match):
-        if self.make_href(match) != self.frbr_uri.work_uri():
-            return True
+        href = self.make_href(match)
+        return href and href != self.frbr_uri.work_uri()
+
+    def is_text_match_valid(self, text, match):
+        href = self.make_href(match)
+        return href and href != self.frbr_uri.work_uri()
 
     def markup_node_match(self, node, match):
         """Markup the match with a ref tag. The first group in the match is substituted with the ref."""
