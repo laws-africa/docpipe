@@ -160,7 +160,9 @@ class RefsActMatcherTest(TestCase):
 <div>
   <p><b>Recalling </b> Act 25 of 2020, the Need to Prepare</p>
   <p><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
+  <p><b>Recalling</b> Act 1 of 1992 on the Composition and Operationalization</p>
   <p>No markup inside existing <a href="#foo">Act 12 of 2021</a> A tags.</p>
+  <p>Avoid weird years Act 11 of 19 and others.</p>
 </div>
 """
         )
@@ -169,8 +171,10 @@ class RefsActMatcherTest(TestCase):
         self.assertMultiLineEqual(
             """<div>
   <p><b>Recalling </b> <a href="/akn/za/act/2020/25">Act 25 of 2020</a>, the Need to Prepare</p>
-  <p><b>Recalling</b> <a href="/akn/za/act/1992/1">Act 1 of 92</a> on the Composition and Operationalization</p>
+  <p><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
+  <p><b>Recalling</b> <a href="/akn/za/act/1992/1">Act 1 of 1992</a> on the Composition and Operationalization</p>
   <p>No markup inside existing <a href="#foo">Act 12 of 2021</a> A tags.</p>
+  <p>Avoid weird years Act 11 of 19 and others.</p>
 </div>""",
             lxml.html.tostring(html, encoding="unicode", pretty_print=True).strip(),
         )
@@ -186,9 +190,9 @@ class RefsActMatcherTest(TestCase):
                     None,
                 ),
                 ExtractedCitation(
-                    "Act 1 of 92",
+                    "Act 1 of 1992",
                     1,
-                    12,
+                    14,
                     "/akn/za/act/1992/1",
                     None,
                     None,
@@ -208,7 +212,9 @@ class RefsActMatcherTest(TestCase):
     <preamble>
       <p eId="preamble__p_1"><b>Recalling </b> Act 25 of 2020, the Need to Prepare</p>
       <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
+      <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 1992 on the Composition and Operationalization</p>
       <p eId="preamble__p_3">No markup inside existing <ref href="#foo">Act 12 of 2021</ref> ref tags.</p>
+      <p eId="preamebl__p_4">Avoid weird years Act 11 of 19 and others.</p>
     </preamble>
   </statement>
 </akomaNtoso>"""
@@ -222,8 +228,10 @@ class RefsActMatcherTest(TestCase):
     </meta>
     <preamble>
       <p eId="preamble__p_1"><b>Recalling </b> <ref href="/akn/za/act/2020/25">Act 25 of 2020</ref>, the Need to Prepare</p>
-      <p eId="preamble__p_2"><b>Recalling</b> <ref href="/akn/za/act/1992/1">Act 1 of 92</ref> on the Composition and Operationalization</p>
+      <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
+      <p eId="preamble__p_2"><b>Recalling</b> <ref href="/akn/za/act/1992/1">Act 1 of 1992</ref> on the Composition and Operationalization</p>
       <p eId="preamble__p_3">No markup inside existing <ref href="#foo">Act 12 of 2021</ref> ref tags.</p>
+      <p eId="preamebl__p_4">Avoid weird years Act 11 of 19 and others.</p>
     </preamble>
   </statement>
 </akomaNtoso>""",
@@ -241,9 +249,9 @@ class RefsActMatcherTest(TestCase):
                     None,
                 ),
                 ExtractedCitation(
-                    "Act 1 of 92",
+                    "Act 1 of 1992",
                     1,
-                    12,
+                    14,
                     "/akn/za/act/1992/1",
                     None,
                     None,
@@ -264,6 +272,7 @@ class RefsActMatcherTest(TestCase):
   Recalling Act 1994 of 2021, the Need to Prepare
   Recalling Act no. 2022 of 2021, the Need to Prepare
   Recalling Act 2022 of 2021, the Need to Prepare
+  Avoid weird years Act 11 of 19 and others.
 """
         self.marker.extract_text_matches(self.frbr_uri, text)
 
@@ -312,7 +321,7 @@ class RefsActMatcherTest(TestCase):
                 ExtractedCitation(
                     "Act 2022 of 2021", 463, 479, "/akn/za/act/2021/2022", 0,
                     'e Need to Prepare\n  Recalling ',
-                    ', the Need to Prepare\n',
+                    ', the Need to Prepare\n  Avoid ',
                 ),
             ],
             self.marker.citations,
