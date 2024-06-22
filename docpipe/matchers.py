@@ -1,8 +1,28 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Match, Iterable, Dict
 
 from lxml import etree
 
 from docpipe.xmlutils import wrap_text
+
+
+@dataclass
+class ExtractedMatch:
+    """ A match in a text string, which can be manipulated if necessary.
+    """
+    original_match: Match = None
+    text: str = None
+    """Full text of the match."""
+    start: int = None
+    """Start position of the match in the original context."""
+    end: int = None
+    """End position of the match in the original context."""
+    groups: Dict[str, str] = field(default_factory=dict)
+    """Regex group values."""
+
+    @property
+    def string(self):
+        return self.original_match.string
 
 
 class TextPatternMatcher:
@@ -93,15 +113,25 @@ class TextPatternMatcher:
             if self.is_text_match_valid(text, match):
                 self.handle_text_match(text, match)
 
-    def find_text_matches(self, text):
+    def find_text_matches(self, text) -> Iterable[ExtractedMatch]:
         """Return an iterable of matches in this chunk of text."""
-        return self.pattern_re.finditer(text)
+        for m in self.pattern_re.finditer(text):
+            yield self.make_extracted_match(m)
 
-    def is_text_match_valid(self, text, match):
+    def is_text_match_valid(self, text, match: ExtractedMatch):
         return True
 
-    def handle_text_match(self, text, match):
+    def handle_text_match(self, text, match: ExtractedMatch):
         pass
+
+    def make_extracted_match(self, match: Match) -> ExtractedMatch:
+        return ExtractedMatch(
+            match,
+            match.group(),
+            match.start(),
+            match.end(),
+            match.groupdict(),
+        )
 
     ### handle extraction from html and xml
 
@@ -158,7 +188,7 @@ class TextPatternMatcher:
                         # we didn't break out of the loop, so there are no valid matches, give up
                         node = None
 
-    def handle_node_match(self, node, match, in_tail):
+    def handle_node_match(self, node, match: ExtractedMatch, in_tail):
         """Process a match. If this modifies the text (or tail, if in_tail is True), then
         return the new node that should have its tail checked for further matches.
         Otherwise, return None.
@@ -168,10 +198,10 @@ class TextPatternMatcher:
             if marker is not None:
                 return wrap_text(node, in_tail, lambda t: marker, start_pos, end_pos)
 
-    def is_node_match_valid(self, node, match):
+    def is_node_match_valid(self, node, match: ExtractedMatch):
         return True
 
-    def markup_node_match(self, node, match):
+    def markup_node_match(self, node, match: ExtractedMatch):
         """Create a markup element for a match.
 
         Returns an (element, start_pos, end_pos) tuple.
@@ -182,8 +212,8 @@ class TextPatternMatcher:
         Element may be None to indicate that no markup should be inserted.
         """
         marker = etree.Element(self.marker_tag)
-        marker.text = match.group(0)
-        return marker, match.start(0), match.end(0)
+        marker.text = match.text
+        return marker, match.start, match.end
 
     def ancestor_nodes(self):
         if self.ancestor_xpath is None:
@@ -224,20 +254,20 @@ class CitationMatcher(TextPatternMatcher):
         super().setup(*args, **kwargs)
         self.citations = []
 
-    def handle_text_match(self, text, match):
+    def handle_text_match(self, text, match: ExtractedMatch):
         href = self.make_href(match)
         if href:
             self.citations.append(
                 ExtractedCitation(
-                    match.group(),
-                    match.start(),
-                    match.end(),
+                    match.text,
+                    match.start,
+                    match.end,
                     href,
                     self.pagenum,
                     # prefix
-                    match.string[max(match.start() - self.text_prefix_length, 0):match.start()],
+                    match.string[max(match.start - self.text_prefix_length, 0):match.start],
                     # suffix
-                    match.string[match.end():min(match.end() + self.text_suffix_length, len(match.string))],
+                    match.string[match.end:min(match.end + self.text_suffix_length, len(match.string))],
                 )
             )
 
@@ -258,15 +288,15 @@ class CitationMatcher(TextPatternMatcher):
         node, start, end = super().markup_node_match(node, match)
         node.set("href", href)
         self.citations.append(
-            ExtractedCitation(match.group(), match.start(), match.end(), href, None, None, None)
+            ExtractedCitation(match.text, match.start, match.end, href, None, None, None)
         )
         return node, start, end
 
-    def make_href(self, match):
+    def make_href(self, match: ExtractedMatch):
         """Turn this match into a full FRBR URI href using the href_pattern. Subclasses can also
         override this method to do more complex things.
         """
         return self.href_pattern.format(**self.href_pattern_args(match))
 
-    def href_pattern_args(self, match):
-        return match.groupdict()
+    def href_pattern_args(self, match: ExtractedMatch):
+        return match.groups
