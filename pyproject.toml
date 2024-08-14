@@ -4,27 +4,22 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "docpipe"
-version = "0.3.0"
+version = "0.4.0"
 authors = [
   { name="Greg Kempe", email="greg@laws.africa" },
 ]
 description = "A simple pipeline for processing documents"
 readme = "README.md"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "cobalt >= 6",
+    "cobalt >= 9",
     "cssutils >= 2",
     "lxml >= 4.0, <5.0.0",
-]
-
-[project.optional-dependencies]
-test = [
-  "nose",
 ]
 
 [project.urls]
