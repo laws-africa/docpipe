@@ -13,8 +13,8 @@ This has some other non-Python dependencies for certain functionality:
 
 1. Clone this repo
 2. Setup a virtual environment
-3. Install dependencies: `pip install -e '.[test]'`
-4. Run tests: `nosetests`
+3. Install dependencies: `pip install -e .`
+4. Run tests: `python -m unittest`
 
 # License
 
