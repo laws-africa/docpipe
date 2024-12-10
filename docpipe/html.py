@@ -321,9 +321,13 @@ class SplitPOnBr(Stage):
 
                     # when the br falls inside an intervening tag, e.g.
                     # <p>Text 1 <b>bold 1<br>bold 2</b> text 2</p>
-                    # make sure ' text 2' ends up in the right place
-                    elem.tail = br.getparent().tail
-                    br.getparent().tail = None
+                    # make sure ' text 2' ends up in the right place.
+                    #
+                    # This is the case when i > 0 and there are intervening tags. The tail of the main p is handled
+                    # at the end of the function.
+                    if i < len(elements) - 1:
+                        elem.tail = br.getparent().tail
+                        br.getparent().tail = None
 
                     continue
 
@@ -338,6 +342,9 @@ class SplitPOnBr(Stage):
                 p.append(sibling)
 
             # parent is the original p
+            # move tail text onto the new p
+            p.tail = parent.tail
+            parent.tail = None
             parent.addnext(p)
             br.getparent().remove(br)
 
