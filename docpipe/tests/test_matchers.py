@@ -163,6 +163,8 @@ class RefsActMatcherTest(TestCase):
   <p><b>Recalling</b> Act 1 of 1992 on the Composition and Operationalization</p>
   <p>No markup inside existing <a href="#foo">Act 12 of 2021</a> A tags.</p>
   <p>Avoid weird years Act 11 of 19 and others.</p>
+  <p>National Environment Management: Air Quality Act, 2004 (Act No. 39 of 2004);</p>
+  <p>National Environment Management: Air Quality Act, 2004 (No. 39 of 2004);</p>
 </div>
 """
         )
@@ -175,6 +177,8 @@ class RefsActMatcherTest(TestCase):
   <p><b>Recalling</b> <a href="/akn/za/act/1992/1">Act 1 of 1992</a> on the Composition and Operationalization</p>
   <p>No markup inside existing <a href="#foo">Act 12 of 2021</a> A tags.</p>
   <p>Avoid weird years Act 11 of 19 and others.</p>
+  <p>National Environment Management: Air Quality Act, 2004 (<a href="/akn/za/act/2004/39">Act No. 39 of 2004</a>);</p>
+  <p>National Environment Management: Air Quality <a href="/akn/za/act/2004/39">Act, 2004 (No. 39 of 2004)</a>;</p>
 </div>""",
             lxml.html.tostring(html, encoding="unicode", pretty_print=True).strip(),
         )
@@ -198,6 +202,23 @@ class RefsActMatcherTest(TestCase):
                     None,
                     None,
                 ),
+                ExtractedCitation(
+                    'Act No. 39 of 2004',
+                    56,
+                    74,
+                    '/akn/za/act/2004/39',
+                    None,
+                    None,
+                    None),
+                ExtractedCitation(
+                    'Act, 2004 (No. 39 of 2004)',
+                    45,
+                    71,
+                    '/akn/za/act/2004/39',
+                    None,
+                    None,
+                    None
+                )
             ],
             self.marker.citations,
         )
@@ -214,7 +235,9 @@ class RefsActMatcherTest(TestCase):
       <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
       <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 1992 on the Composition and Operationalization</p>
       <p eId="preamble__p_3">No markup inside existing <ref href="#foo">Act 12 of 2021</ref> ref tags.</p>
-      <p eId="preamebl__p_4">Avoid weird years Act 11 of 19 and others.</p>
+      <p eId="preamble__p_4">Avoid weird years Act 11 of 19 and others.</p>
+      <p eId="preamble__p_5">National Environment Management: Air Quality Act, 2004 (Act No. 39 of 2004);</p>
+      <p eId="preamble__p_6">National Environment Management: Air Quality Act, 2004 (No. 39 of 2004);</p>
     </preamble>
   </statement>
 </akomaNtoso>"""
@@ -231,7 +254,9 @@ class RefsActMatcherTest(TestCase):
       <p eId="preamble__p_2"><b>Recalling</b> Act 1 of 92 on the Composition and Operationalization</p>
       <p eId="preamble__p_2"><b>Recalling</b> <ref href="/akn/za/act/1992/1">Act 1 of 1992</ref> on the Composition and Operationalization</p>
       <p eId="preamble__p_3">No markup inside existing <ref href="#foo">Act 12 of 2021</ref> ref tags.</p>
-      <p eId="preamebl__p_4">Avoid weird years Act 11 of 19 and others.</p>
+      <p eId="preamble__p_4">Avoid weird years Act 11 of 19 and others.</p>
+      <p eId="preamble__p_5">National Environment Management: Air Quality Act, 2004 (<ref href="/akn/za/act/2004/39">Act No. 39 of 2004</ref>);</p>
+      <p eId="preamble__p_6">National Environment Management: Air Quality <ref href="/akn/za/act/2004/39">Act, 2004 (No. 39 of 2004)</ref>;</p>
     </preamble>
   </statement>
 </akomaNtoso>""",
@@ -257,6 +282,24 @@ class RefsActMatcherTest(TestCase):
                     None,
                     None,
                 ),
+                ExtractedCitation(
+                    'Act No. 39 of 2004',
+                    56,
+                    74,
+                    '/akn/za/act/2004/39',
+                    None,
+                    None,
+                    None,
+                ),
+                ExtractedCitation(
+                    'Act, 2004 (No. 39 of 2004)',
+                    45,
+                    71,
+                    '/akn/za/act/2004/39',
+                    None,
+                    None,
+                    None,
+                )
             ],
             self.marker.citations,
         )
