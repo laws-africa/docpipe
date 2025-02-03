@@ -1,6 +1,7 @@
 import re
+from typing import Match
 
-from .matchers import CitationMatcher
+from .matchers import CitationMatcher, ExtractedMatch
 
 
 class AchprResolutionMatcher(CitationMatcher):
@@ -67,3 +68,11 @@ class ActMatcher(CitationMatcher):
         args['juri'] = self.frbr_uri.country
 
         return args
+
+    def make_extracted_match(self, match: Match) -> ExtractedMatch:
+        em = super().make_extracted_match(match)
+        # adjust the match so that if we don't have a '(' in the match, then we must exclude any trailing ')`
+        if em.text.endswith(')') and '(' not in em.text:
+            em.text = em.text[:-1]
+            em.end -= 1
+        return em
