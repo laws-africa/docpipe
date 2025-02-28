@@ -1,4 +1,5 @@
 import subprocess
+import tempfile
 from os import listdir
 from os.path import splitext, join, isfile, basename
 from shutil import copyfileobj
@@ -10,6 +11,7 @@ from docpipe.pipeline import Stage, Attachment
 
 
 SOFFICE_CMD = 'soffice'
+SOFFICE_ARGS = ['--headless']
 log = logging.getLogger(__name__)
 
 # subprocess timeout (in seconds)
@@ -74,17 +76,20 @@ def soffice_convert(infile, insuffix, outsuffix):
 
 
 def soffice(args):
-    args = [SOFFICE_CMD, "--headless"] + args
+    # concurrent soffice commands don't play well together, so give each its own temporary profile directory
+    with tempfile.TemporaryDirectory() as profile_dir:
+        args = [f'-env:UserInstallation=file://{profile_dir}'] + args
+        args = [SOFFICE_CMD] + SOFFICE_ARGS + args
 
-    try:
-        result = subprocess.run(
-            args,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT, check=True,
-            encoding='utf-8',
-            timeout=TIMEOUT,
-            errors='backslashreplace')
-        log.info(f"Output from soffice: {result.stdout}")
-    except subprocess.CalledProcessError as e:
-        log.error(f"Error calling soffice. Output: \n{e.output}", exc_info=e)
-        raise SOfficeError(e.output)
+        try:
+            result = subprocess.run(
+                args,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT, check=True,
+                encoding='utf-8',
+                timeout=TIMEOUT,
+                errors='backslashreplace')
+            log.info(f"Output from soffice: {result.stdout}")
+        except subprocess.CalledProcessError as e:
+            log.error(f"Error calling soffice. Output: \n{e.output}", exc_info=e)
+            raise SOfficeError(e.output)
