@@ -19,6 +19,7 @@ classifiers = [
 dependencies = [
     "cobalt >= 9",
     "cssutils >= 2",
+    "lxml >= 5.0.0, < 6.0.0",
     "lxml_html_clean >= 0.4.1",
 ]
 
