@@ -39,7 +39,7 @@ class AchprResolutionMatcher(CitationMatcher):
         return args
 
 
-class ActMatcher(CitationMatcher):
+class ActNoOfYearMatcher(CitationMatcher):
     """ Finds references to Acts in documents, of the form:
     Act 5 of 2019
     Act No. 3 of 92
@@ -76,3 +76,28 @@ class ActMatcher(CitationMatcher):
             em.text = em.text[:-1]
             em.end -= 1
         return em
+
+
+# legacy name for backwards compatibility
+ActMatcher = ActNoOfYearMatcher
+
+
+class ActYearNumberMatcher(ActNoOfYearMatcher):
+    """Finds references to Acts of the form:
+
+    - Foo Act, 1999 (Act 123)
+    """
+    pattern_re = re.compile(r"((?P<year>\d{4})\s*)?\(\s*(?P<ref>Act\s*(?P<num>\d+)\s*)\)", re.I)
+
+    def make_extracted_match(self, match: Match) -> ExtractedMatch:
+        match = super().make_extracted_match(match)
+        # adjust the match so that it only covers the "ref" group
+        match.text = match.groups["ref"]
+        match.start = match.original_match.start("ref")
+        match.end = match.original_match.end("ref")
+        return match
+
+    def make_href(self, match: ExtractedMatch):
+        year = match.groups["year"]
+        num = match.groups["num"]
+        return f"/akn/gh/act/{year}/{num}"
