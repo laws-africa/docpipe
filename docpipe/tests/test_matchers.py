@@ -5,7 +5,7 @@ import lxml.html
 from lxml import etree
 from cobalt import FrbrUri
 
-from docpipe.citations import AchprResolutionMatcher, ActMatcher
+from docpipe.citations import AchprResolutionMatcher, ActNoOfYearMatcher, ActYearNumberMatcher
 from docpipe.matchers import ExtractedCitation
 
 
@@ -147,11 +147,11 @@ class RefsAchprResolutionMatcherTest(TestCase):
         )
 
 
-class RefsActMatcherTest(TestCase):
+class RefsActNoOfYearMatcherTest(TestCase):
     maxDiff = None
 
     def setUp(self):
-        self.marker = ActMatcher()
+        self.marker = ActNoOfYearMatcher()
         self.frbr_uri = FrbrUri.parse("/akn/za-wc/act/2021/509")
 
     def test_html_matches(self):
@@ -365,6 +365,102 @@ class RefsActMatcherTest(TestCase):
                     "Act 2022 of 2021", 463, 479, "/akn/za/act/2021/2022", 0,
                     'e Need to Prepare\n  Recalling ',
                     ', the Need to Prepare\n  Avoid ',
+                ),
+            ],
+            self.marker.citations,
+        )
+
+
+class ActYearNumberTest(TestCase):
+    maxDiff = None
+
+    def setUp(self):
+        self.marker = ActYearNumberMatcher()
+        self.frbr_uri = FrbrUri.parse("/akn/za-wc/act/2021/509")
+
+    def test_html_matches(self):
+        html = lxml.html.fromstring(
+            """
+<div>
+  <p>No markup inside existing Act, 1990 (<a href="#foo">Act 123</a>) A tags.</p>
+  <p>National Environment Management: Air Quality Act, 1990 (Act 123);</p>
+</div>
+"""
+        )
+        self.marker.markup_html_matches(self.frbr_uri, html)
+
+        self.assertMultiLineEqual(
+            """<div>
+  <p>No markup inside existing Act, 1990 (<a href="#foo">Act 123</a>) A tags.</p>
+  <p>National Environment Management: Air Quality Act, 1990 (<a href="/akn/gh/act/1990/123">Act 123</a>);</p>
+</div>""",
+            lxml.html.tostring(html, encoding="unicode", pretty_print=True).strip(),
+        )
+        self.assertEqual(
+            [
+                ExtractedCitation(
+                    "Act 123",
+                    56,
+                    63,
+                    "/akn/gh/act/1990/123",
+                    None,
+                    None,
+                    None,
+                ),
+            ],
+            self.marker.citations,
+        )
+
+    def test_xml_matches(self):
+        xml = etree.fromstring(
+            """<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <statement name="statement">
+    <preamble>
+      <p eId="preamble__p_2">No markup inside existing Act, 1990 (<ref href="#foo">Act 123</ref>) ref tags.</p>
+      <p eId="preamble__p_4">National Environment Management: Air Quality Act, 1990 (Act 123);</p>
+    </preamble>
+  </statement>
+</akomaNtoso>"""
+        )
+        self.marker.markup_xml_matches(self.frbr_uri, xml)
+
+        self.assertMultiLineEqual("""<akomaNtoso xmlns="http://docs.oasis-open.org/legaldocml/ns/akn/3.0">
+  <statement name="statement">
+    <preamble>
+      <p eId="preamble__p_2">No markup inside existing Act, 1990 (<ref href="#foo">Act 123</ref>) ref tags.</p>
+      <p eId="preamble__p_4">National Environment Management: Air Quality Act, 1990 (<ref href="/akn/gh/act/1990/123">Act 123</ref>);</p>
+    </preamble>
+  </statement>
+</akomaNtoso>""",
+                                  etree.tostring(xml, encoding="unicode", pretty_print=True).strip(),
+                                  )
+        self.assertEqual(
+            [
+                ExtractedCitation(
+                    "Act 123",
+                    56,
+                    63,
+                    "/akn/gh/act/1990/123",
+                    None,
+                    None,
+                    None,
+                ),
+            ],
+            self.marker.citations,
+        )
+
+    def test_text_matches(self):
+        text = """
+  National Environment Management: Air Quality Act, 1990 (Act 123)
+"""
+        self.marker.extract_text_matches(self.frbr_uri, text)
+
+        self.assertEqual(
+            [
+                ExtractedCitation(
+                    "Act 123", 59, 66, "/akn/gh/act/1990/123", 0,
+                    'ement: Air Quality Act, 1990 (',
+                    ')\n'
                 ),
             ],
             self.marker.citations,
