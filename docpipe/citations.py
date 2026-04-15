@@ -87,7 +87,7 @@ class ActYearNumberMatcher(ActNoOfYearMatcher):
 
     - Foo Act, 1999 (Act 123)
     """
-    pattern_re = re.compile(r"((?P<year>\d{4})\s*)?\(\s*(?P<ref>Act\s*(?P<num>\d+)\s*)\)", re.I)
+    pattern_re = re.compile(r"(?P<year>\d{4})\s*\(\s*(?P<ref>Act\s*(?P<num>\d+)\s*)\)", re.I)
 
     def make_extracted_match(self, match: Match) -> ExtractedMatch:
         match = super().make_extracted_match(match)

@@ -384,6 +384,7 @@ class ActYearNumberTest(TestCase):
 <div>
   <p>No markup inside existing Act, 1990 (<a href="#foo">Act 123</a>) A tags.</p>
   <p>National Environment Management: Air Quality Act, 1990 (Act 123);</p>
+  <p>Ignores without a year: Air Act (Act 123);</p>
 </div>
 """
         )
@@ -393,6 +394,7 @@ class ActYearNumberTest(TestCase):
             """<div>
   <p>No markup inside existing Act, 1990 (<a href="#foo">Act 123</a>) A tags.</p>
   <p>National Environment Management: Air Quality Act, 1990 (<a href="/akn/gh/act/1990/123">Act 123</a>);</p>
+  <p>Ignores without a year: Air Act (Act 123);</p>
 </div>""",
             lxml.html.tostring(html, encoding="unicode", pretty_print=True).strip(),
         )
